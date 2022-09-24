@@ -6,13 +6,13 @@
 - Section 4：从如何解决遇到的挑战角度介绍最常见的优化算法，然后得到这些算法的更新规则；
 - Section 5：介绍在并行和分布式设置中优化梯度下降的算法和架构；
 - Section 6：考虑有助于优化梯度下降的其他策略；
-- 
+
 ## Gradient Descent
 
 > 梯度下降用于大多数受欢迎的算法，也是最普遍的优化神经网络的算法。同时每个深度学习库也包含许多梯度下降算法。这些算法通常被用作黑盒优化，因为很难找到对其优缺点的实际解释。
 
 **更新准则：**
-目标函数$J(\theta)$，其中$\theta\in\mathcal R^d$：
+目标函数 $J(\theta)$ ，其中 $\theta\in\mathcal R^d$ ：
 $$\theta=\theta-\eta\nabla_{\theta}J(\theta)$$
 ### Gradient descent的变体
 #### 批量梯度下降（Batch gradient descent，BGD）
@@ -25,11 +25,12 @@ for i in range(nb_epochs ):
 	params = params - learning_rate * params_grad
 ```
 #### 随机梯度下降（Stochastic gradient descent，SGD）
-相比于BGD下降，SGD对每一个数据$(x^{(i)},y^{(i)})$都更新参数：$$\theta=\theta-\eta\nabla_{\theta}J(\theta;x^{(i)};y^{(i)})$$
+相比于BGD下降，SGD对每一个数据 $(x^{(i)},y^{(i)})$ 都更新参数：
+$$\theta=\theta-\eta\nabla_{\theta}J(\theta;x^{(i)};y^{(i)})$$
 - 优点：每个样本点更新一次参数，减少了冗余计算，提高了算法运行速度；
 - 缺点：SGD以高方差频繁更新参数导致目标函数大幅波动。
-> **SGD和批量梯度下降的比较**
-> SGD可能会在收敛到极小值点后继续改变参数值，也可能跳出当前极小值点收敛到更好的局部极小值点。
+> **SGD和批量梯度下降的比较**   
+> SGD可能会在收敛到极小值点后继续改变参数值，也可能跳出当前极小值点收敛到更好的局部极小值点。  
 > 实践表明，当慢慢降低学习率时，SGD和批量梯度下降巨有相同的收敛性。
 
 	for i in range(nb_epochs ):
@@ -39,7 +40,7 @@ for i in range(nb_epochs ):
 			params = params - learning_rate * params_grad
 
 #### 小批量梯度下降（Mini-batch gradient descent)
-小批量梯度下降结合了SGD和批量梯度下降优点，对样本中每个小批量中$n$个样本进行参数更新:
+小批量梯度下降结合了SGD和批量梯度下降优点，对样本中每个小批量中 $n$ 个样本进行参数更新:
 
 $$ \theta=\theta-\eta\nabla_{\theta}J(\theta;x^{(i:i+n)};y^{(i:i+n)}) $$
 
@@ -60,5 +61,4 @@ $$ \theta=\theta-\eta\nabla_{\theta}J(\theta;x^{(i:i+n)};y^{(i:i+n)}) $$
 小批量梯度下降算法并不能保证算法的首先性，面对着如下挑战：
 - 学习率选择困难。学习率过小会导致收敛极其缓慢；学习率过大会破坏收敛而且使损失方程在最小值点震荡甚至发散。
 - 学习率时间表尝试在训练过程中调整学习率，
-
-$ J_\alpha(x) = \sum_{m=0}^\infty \frac{(-1)^m}{m! \Gamma (m + \alpha + 1)} {\left({ \frac{x}{2} }\right)}^{2m + \alpha} \text {，行内公式示例} $
+- 
