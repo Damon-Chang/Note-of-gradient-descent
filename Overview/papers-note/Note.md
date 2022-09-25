@@ -66,6 +66,10 @@ $$ \theta=\theta-\eta\nabla_{\theta}J(\theta;x^{(i:i+n)};y^{(i:i+n)}) $$
 ## 梯度下降优化算法
 ### 动量（Momentum）
 **产生背景：** SGD算法在沟壑处（即曲面一个维度的陡峭程度远大于另一个维度）陷入困境。这在局部最小值附近很常见。该情况下，SGD在沟壑的斜坡上震荡，只是沿着底部向最优方向上缓慢前进。
-![](OverviewNote_md_files/cad493d0-3c76-11ed-b19b-bd4b5976af6e.jpeg?v=1&type=image)
+![](OverviewNote_md_files/cad493d0-3c76-11ed-b19b-bd4b5976af6e.jpeg?v=1&type=image)   
 Momentum能够帮助SGD在相关方向上加速收敛并减缓震荡。其在更新方向上加入了 $\lambda$ 倍的前一步方向。
-$$ v_t=\lambda v_{t-1}+\eta \nabla_\theta J(\theta) $$ $$ \theta=\theta-v_t $$
+
+$$ v_t=\lambda v_{t-1}+\eta \nabla_\theta J(\theta) $$
+
+$$ \theta=\theta-v_t $$
+
