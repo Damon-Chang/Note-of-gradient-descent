@@ -111,3 +111,36 @@ $$\theta_{t+1}=\theta_t-\frac{\eta}{\sqrt{G_t+\epsilon}}\odot g_t$$
 其中 $\odot$ 表示对应元素相乘。
 - 优点：Adagrad实现了自动调节学习率，一般初始值设置为 $0.01$ .
 - 缺点：Adagrad 的主要弱点是它在分母中累积平方梯度：由于每个添加的项都是正数，因此累积和在训练期间不断增长。这反过来会导致学习率缩小并最终变得无限小，此时算法不再能够获得额外的知识。
+### Adadelta
+Adadelta是Adagrad的改进。它旨在降低激进的、单调递减的学习率。Adadelta不是累计过去所有的梯度平方和，而是将累计过去梯度的窗口限制在一个固定大小 $w$ .
+**计算方式**：不是低效地存储 $w$ 个先前的平方梯度，梯度和递归地定义为过去所有梯度平方的衰减平均值。则 $t$ 时刻的学习率 $\eta$ 仅取决于梯度均值和当前的向量:
+
+$$E[g^2 ]_t=\gamma E[g^2]_{t-1}+(1-\gamma)g_t^2$$
+
+其中 $\gamma$ 取值在  $0.9$ 左右，则更新规则可写为：
+
+$$\theta_{t+1}=\theta_t-\frac{\eta}{\sqrt{G_t+\epsilon}}\odot g_t$$
+
+$$\theta_{t+1}=\theta_t-\frac{\eta}{RMS[g]_t}\odot g_t$$
+
+注意，其中：
+
+$$\triangle\theta_t=-\frac{\eta}{\sqrt{G_t+\epsilon}}\odot g_t=-\frac{\eta}{RMS[g]_t}\odot g_t$$
+
+作者指出，此更新（以及 SGD、Momentum 或 Adagrad）中的单位不匹配，即更新应该具有与参数相同的假设单位。为了实现这一点，他们首先定义了另一个指数衰减平均值，这一次不是平方梯度，而是平方参数更新：
+
+$$E[\triangle\theta^2]_t=\gamma E[\triangle\theta^2]_{t-1}+(1-\gamma)\triangle\theta_t^2$$
+
+因此，参数更新的均方根误差为：
+
+$$RMS[\triangle\theta]_t=\sqrt{E[\triangle\theta^2]_t+\epsilon}$$
+
+由于 $RMS[\triangle\theta]_t$ 未知，使用 $RMS[\triangle\theta]_{t-1}$ 近似代替。用 $RMS[\triangle\theta]_{t-1}$ 代替 $\eta$ ，则Adadelta更新规则为：
+
+$$\triangle\theta_t=-\frac{RMS[\triangle\theta]_{t-1}}{RMS[g]_t} g_t$$
+
+$$\theta_{t+1}=\theta_t+\triangle\theta_t$$
+
+使用Adadelta我们甚至无需设置一个初始学习率，因为他已经在参数更新过程中被删除。
+### RMSprop
+RMSprop是一个未发表的自适应学习率方法。是Geoff Hinton在他的[课程](http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf)中提出来的。
