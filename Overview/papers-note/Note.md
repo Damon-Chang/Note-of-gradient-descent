@@ -79,7 +79,7 @@ $$ \theta=\theta-v_t $$
 小球若从斜坡上盲目地滚下来是很不令人满意的。我们想找到一个聪明的小球，有意识自己将去往何方，因此他也可以在斜坡升高前减速。   
 NAG建立在Momentum的基础上，给小球这样的先见之明。已知我们将使用动量 $\gamma v_{t-1}$ 来移动参数 $\theta$ ，通过计算 $\theta-\gamma v_{t-1}$ 给定下辖一个参数位置的估计（全部更新时梯度缺失），这是关于参数将来位置的粗略概念。我们现在可以通过计算**近似的未来参数位置**而不是当前梯度位置来计算参数的梯度来有效地获得先见之明。
 
-$$v_t=\gamma v_t-1+\eta \nabla_\theta  J(\theta-\gamma v_{t-1})$$ $$\theta=\theta-v_t$$
+$$v_t=\gamma v_{t-1}+\eta \nabla_\theta  J(\theta-\gamma v_{t-1})$$ $$\theta=\theta-v_t$$
 
 ![](OverviewNote_md_files/886cd830-3cc2-11ed-b19b-bd4b5976af6e.jpeg?v=1&type=image)
 现在积累梯度方向进行大跳跃，再计算在下一步梯度方向。二者矢量和作为向量更新方向。
