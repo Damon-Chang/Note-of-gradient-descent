@@ -129,7 +129,7 @@ $$\triangle\theta_t=-\frac{\eta}{\sqrt{G_t+\epsilon}}\odot g_t=-\frac{\eta}{RMS[
 
 作者指出，此更新（以及 SGD、Momentum 或 Adagrad）中的单位不匹配，即更新应该具有与参数相同的假设单位。为了实现这一点，他们首先定义了另一个指数衰减平均值，这一次不是平方梯度，而是平方参数更新：
 
-$$E[\triangle\theta^2]_t=\gamma E[\triangle\theta^2]_{t-1}+(1-\gamma)\triangle\theta_t^2$$
+$$E[\triangle\theta^2]_t=\gamma{E[\triangle\theta^2]}_{t-1} +(1-\gamma)\triangle\theta_t^2$$
 
 因此，参数更新的均方根误差为：
 
