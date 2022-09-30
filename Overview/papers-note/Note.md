@@ -144,3 +144,37 @@ $$\theta_{t+1}=\theta_t+\triangle\theta_t$$
 使用Adadelta我们甚至无需设置一个初始学习率，因为他已经在参数更新过程中被删除。
 ### RMSprop
 RMSprop是一个未发表的自适应学习率方法。是Geoff Hinton在他的[课程](http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf)中提出来的。
+RMSprop 和 Adadelta 都是在同一时间独立开发的，因为需要解决 Adagrad 急剧下降的学习率问题。RMSprop 实际上与我们上面推导出的 Adadelta 的第一个更新向量相同，更新规则：
+
+$$E[g^2]_t=0.9E[g^2]_{t-1}+0.1g_t^2$$
+
+$$\theta_{t+1}=\theta_t-\frac{\eta}{\sqrt{E[g^2]_t+\epsilon}} g_t$$
+
+RMSprop页将学习率除以平方梯度指数衰减的平均值。Hinton建议： $\gamma=0.9$ , $\eta=0.001$.
+### Adam
+Adam（Adaptive Moment Estimation）自适应矩估计对每一个参数计算自适应学习率。除了像Adadelta和RMSprop一样存储过去梯度指数递减的平均平方值 $v_t$ ，Adam还存储过去梯度指数递减的平均值 $m_t$ ，和动量类似.
+
+$$m_t=\beta_1 m_{t-1}+(1-\beta_1)g_t$$
+
+$$v_t=\beta_2v_{t-1}+(1-\beta_2)g_t^2$$
+
+ -  $m_t$ 和 $v_t$ 分别是梯度的一阶矩（均值）和二阶矩（非中心方差）的估计值，因此得名。由于 $m_t$ 和 $v_t$ 被初始化为 0 的向量，Adam 的作者观察到它们偏向于零，尤其是在初始时间步长期间，尤其是当衰减率较小时（即 $β_1$ 和 $β_2$ 接近 1）。
+- 通过计算偏差校正的一阶和二阶矩估计来抵消这些偏差，校正方法如下：
+
+$$\hat{m}_t=\frac{m_t}{1-\beta_1^t}$$
+
+$$\hat{v_t}=\frac{v_t}{1-\beta_2^t}$$
+
+得到Adam的参数更新方程：
+
+$$\theta_{t+1}=\theta_t-\frac{\eta}{\sqrt{\hat{v_t}}+\epsilon}\hat{m_t}$$
+
+默认值： $\beta_1=0,9$ , $\beta_2=0.999$ , $\epsilon=10^{-8}$ 。Adam算法在自适应学习中表现良好且和其他算法相比具有优势。
+### AdaMax
+在Adam中，因子 $v_t$ 使得梯度和过去梯度的 $l_2$ 范数以及当前梯度 $|g_t|^2$ 成反比：
+
+$$v_t=\beta_2v_{t-1}+(1-\beta_2)|g_t|^2$$
+
+推广到 $l_p$ 范数（Kingma和Ba也将 $\beta_2$ 参数化为 $\beta_2^p$ ）：
+
+$$v_t=\beta_2^pv_{t-1}+(1-\beta_2^p)|g_t|^p$$
