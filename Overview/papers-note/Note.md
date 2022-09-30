@@ -125,17 +125,17 @@ $$\theta_{t+1}=\theta_t-\frac{\eta}{RMS[g]_t}\odot g_t$$
 
 注意，其中：
 
-$$\triangle\theta_t=-\frac{\eta}{\sqrt{G_t+\epsilon}}\odot g_t=-\frac{\eta}{RMS[g]_t}\odot g_t$$
+$$\triangle\theta_t=-\frac{\eta}{\sqrt{G_t+\epsilon}}\odot g_t=-\frac{\eta}{RMS[g]_t}\odot g_t$$     
 
 作者指出，此更新（以及 SGD、Momentum 或 Adagrad）中的单位不匹配，即更新应该具有与参数相同的假设单位。为了实现这一点，他们首先定义了另一个指数衰减平均值，这一次不是平方梯度，而是平方参数更新：
 
-$$E[\triangle\theta^2]_t=\gamma{E[\triangle\theta^2]}_{t-1} +(1-\gamma)\triangle\theta_t^2$$
+$$ E[\triangle \theta^2]_t=\gamma {E[\triangle \theta^2]}_{t-1} +(1-\gamma)\triangle\theta_t^2 $$
 
 因此，参数更新的均方根误差为：
 
-$$RMS[\triangle\theta]_t=\sqrt{E[\triangle\theta^2]_t+\epsilon}$$
+$$ RMS[\triangle\theta]_t=\sqrt{{E[\triangle\theta^2]}_t+\epsilon} $$    
 
-由于 $RMS[\triangle\theta]_t$ 未知，使用 $RMS[\triangle\theta]_{t-1}$ 近似代替。用 $RMS[\triangle\theta]_{t-1}$ 代替 $\eta$ ，则Adadelta更新规则为：
+由于 ${RMS[\triangle\theta$]$}_t$ 未知，使用 $RMS[\triangle\theta]_{t-1}$ 近似代替。用 $RMS[\triangle\theta]_{t-1}$ 代替 $\eta$ ，则Adadelta更新规则为：
 
 $$\triangle\theta_t=-\frac{RMS[\triangle\theta]_{t-1}}{RMS[g]_t} g_t$$
 
