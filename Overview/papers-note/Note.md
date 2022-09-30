@@ -16,7 +16,7 @@
 $$\theta=\theta-\eta\nabla_{\theta}J(\theta)$$
 ### Gradient descent的变体
 #### 批量梯度下降（Batch gradient descent，BGD）
-计算$\nabla J(\theta)$时不使用全部数据，分次（**epoch**）选择一定批量的样本计算。批量梯度下降保证了$J(\theta)$在凸函数时收敛到全局极小值点（**global minimum**），在非凸问题上收敛到局部极小值点（**local minimum**）。
+计算 $\nabla J(\theta)$ 时不使用全部数据，分次（**epoch**）选择一定批量的样本计算。批量梯度下降保证了 $J(\theta)$ 在凸函数时收敛到全局极小值点（**global minimum**），在非凸问题上收敛到局部极小值点（**local minimum**）。
 - 优点：每次的计算量减小，易于实现，方便计算；
 - 缺点：重复计算产生赘余，速度慢，不能在线计算（新数据不友好）。
 ```
@@ -26,7 +26,9 @@ for i in range(nb_epochs ):
 ```
 #### 随机梯度下降（Stochastic gradient descent，SGD）
 相比于BGD下降，SGD对每一个数据 $(x^{(i)},y^{(i)})$ 都更新参数：
+
 $$\theta=\theta-\eta\nabla_{\theta}J(\theta;x^{(i)};y^{(i)})$$
+
 - 优点：每个样本点更新一次参数，减少了冗余计算，提高了算法运行速度；
 - 缺点：SGD以高方差频繁更新参数导致目标函数大幅波动。
 > **SGD和批量梯度下降的比较**   
@@ -115,13 +117,13 @@ $$\theta_{t+1}=\theta_t-\frac{\eta}{\sqrt{G_t+\epsilon}}\odot g_t$$
 Adadelta是Adagrad的改进。它旨在降低激进的、单调递减的学习率。Adadelta不是累计过去所有的梯度平方和，而是将累计过去梯度的窗口限制在一个固定大小 $w$ .
 **计算方式**：不是低效地存储 $w$ 个先前的平方梯度，梯度和递归地定义为过去所有梯度平方的衰减平均值。则 $t$ 时刻的学习率 $\eta$ 仅取决于梯度均值和当前的向量:
 
-$$E[g^2 ]_t=\gamma E[g^2]_{t-1}+(1-\gamma)g_t^2$$
+$$E\[ g^2 \]_t=\gamma E\[ g^2 \]_{t-1}+(1-\gamma)g_t^2$$
 
 其中 $\gamma$ 取值在  $0.9$ 左右，则更新规则可写为：
 
 $$\theta_{t+1}=\theta_t-\frac{\eta}{\sqrt{G_t+\epsilon}}\odot g_t$$
 
-$$\theta_{t+1}=\theta_t-\frac{\eta}{RMS[g]_t}\odot g_t$$
+$$\theta_{t+1}=\theta_t-\frac{\eta}{RMS \ g \_t}\odot g_t$$
 
 注意，其中：
 
@@ -133,7 +135,7 @@ $$ E[\triangle \theta^2]_t=\gamma {E[\triangle \theta^2]}_{t-1} +(1-\gamma)\tria
 
 因此，参数更新的均方根误差为：
 
-$$ RMS[\triangle\theta]_t=\sqrt{{E[\triangle\theta^2]}_t+\epsilon} $$    
+$$ RMS[\triangle \theta]_t=\sqrt{{E[\triangle\theta^2]}_t+\epsilon} $$    
 
 由于 ${RMS[\triangle\theta$]$}_t$ 未知，使用 $RMS[\triangle\theta]_{t-1}$ 近似代替。用 $RMS[\triangle\theta]_{t-1}$ 代替 $\eta$ ，则Adadelta更新规则为：
 
