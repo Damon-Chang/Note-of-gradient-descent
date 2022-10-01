@@ -127,19 +127,19 @@ $$\theta_{t+1}=\theta_t-\frac{\eta}{RMS \ g \_t}\odot g_t$$
 
 注意，其中：
 
-$$\triangle\theta_t=-\frac{\eta}{\sqrt{G_t+\epsilon}}\odot g_t=-\frac{\eta}{RMS[g]_t}\odot g_t$$     
+$$\triangle\theta_t=-\frac{\eta}{\sqrt{G_t+\epsilon}}\odot g_ t=-\frac{\eta}{RMS[g]_t}\odot g_ t$$     
 
 作者指出，此更新（以及 SGD、Momentum 或 Adagrad）中的单位不匹配，即更新应该具有与参数相同的假设单位。为了实现这一点，他们首先定义了另一个指数衰减平均值，这一次不是平方梯度，而是平方参数更新：
 
-$$ E[\triangle \theta^2]_t=\gamma {E[\triangle \theta^2]}_{t-1} +(1-\gamma)\triangle\theta_t^2 $$
+$$ E[\triangle \theta^2]_ t=\gamma {E[\triangle \theta^2]}_ {t-1} +(1-\gamma)\triangle\theta_ t^2 $$
 
 因此，参数更新的均方根误差为：
 
-$$ RMS[\triangle \theta]_t=\sqrt{{E[\triangle\theta^2]}_t+\epsilon} $$    
+$$ RMS[\triangle \theta]_ t=\sqrt{{E[\triangle\theta^2]}_ t+\epsilon} $$    
 
-由于 ${RMS[\triangle\theta$]$}_t$ 未知，使用 $RMS[\triangle\theta]_{t-1}$ 近似代替。用 $RMS[\triangle\theta]_{t-1}$ 代替 $\eta$ ，则Adadelta更新规则为：
+由于 ${RMS[\triangle\theta]}_ t$ 未知，使用 $RMS[\triangle\theta]_ {t-1}$ 近似代替。用 $RMS[\triangle\theta]_ {t-1}$ 代替 $\eta$ ，则Adadelta更新规则为：
 
-$$\triangle\theta_t=-\frac{RMS[\triangle\theta]_{t-1}}{RMS[g]_t} g_t$$
+$$\triangle\theta_t=-\frac{RMS[\triangle\theta]_ {t-1}}{RMS[g]_ t} g_t$$
 
 $$\theta_{t+1}=\theta_t+\triangle\theta_t$$
 
@@ -180,3 +180,75 @@ $$v_t=\beta_2v_{t-1}+(1-\beta_2)|g_t|^2$$
 推广到 $l_p$ 范数（Kingma和Ba也将 $\beta_2$ 参数化为 $\beta_2^p$ ）：
 
 $$v_t=\beta_2^pv_{t-1}+(1-\beta_2^p)|g_t|^p$$
+
+**范数选择：**
+-  $p$ 较大时算法逐渐变得数值不稳定，因此 $l_ 1$ 和 $l_ 2$ 范数最为常用；
+- 但 $l_ \infty$ 有不错的稳定性。
+
+ 使用AdaMax算法 $l_ \infty$ 收敛到更稳定的值。为避免和Adam算法的混淆，我们使用 $u_t$ 表示无穷范数约束 $v_t$  :
+
+$$u_t=\beta_ 2^\infty v_ {t-1}+(1-\beta_ 2^\infty)|g_t|^\infty=max(\beta_ 2\cdot v_ {t-1},|g_ t|)$$
+
+在 $\sqrt{\hat{v_ t}}+\epsilon$ 用 $u_ t$ 代替 $v_ t$ ，得到AdaMax的迭代规则：
+
+$$\theta_ {t+1}=\theta_ t-\frac{\eta}{u_ t}\hat{m_ t}$$
+
+**注意** ：由于 $u_ t$ 依赖于最大算子，因此这里不像Adam中的 $m_ t$ 和 $v_ t$ 那样倾向于零。因此不需要为 $u_ t$ 计算偏差校正。
+**良好的默认值**：是 $\eta = 0.002$ ，$\beta_1 = 0.9$ ，$\beta_2 = 0.999$.
+
+### Nadam
+> 背景：Adam可以看成RMSprop和monmentum的结合：RMSprop提供了过去梯度平方 $v_ t$ 的指数级递减；momentum贡献过去梯度平均 $m_ t$ 的指数级衰减。
+> **注意**：Nesterov加速算法（NAG）优于一般的动量算法。
+
+Nadam（Nesterov-accelerated Adaptive Moment Estimation，加速自适应矩估计）结合了Adam和NAG。**为结合NAG我们需要修改其动量项 $m_ t$.**
+**回顾Momentum更新规则** ：
+
+$$g_ t=\nabla_ {\theta_ t} J(\theta_ t)$$
+
+$$m_ t=\gamma m_ {t-1}+\eta g_ t$$
+
+$$\theta_ {t+1}=\theta_ t-m_ t$$
+
+其中 $J$ 是目标方程， $\eta$ 是动量衰减项， $\eta$ 是步长。上面的第三项扩展为：
+
+$$\theta_ {t+1}=\theta_ t-(\gamma m_ {t-1}+\eta g_ t)$$
+
+这再次证明了动量算法更新方向包含了过去的动量方向以及当前的梯度方向。
+**回顾NAG更新原则：**
+NAG通过利用当前动量近似计算下一步梯度，使我们能够找到更准确地梯度方向：
+
+$$g_ t=\nabla_ {\theta_ t} J(\theta_ t-\gamma m_ {t-1})$$
+
+$$m_ t=\gamma m_ {t-1}+\eta g_ t$$
+
+$$\theta_ {t+1}=\theta_ t-m_ t$$
+
+Dozat建议：与其使用两次动量（1.近似计算更新下一步梯度；2.更新参数），不如应用前瞻动量直接更新参数（即把前瞻梯度换成前瞻动量）：
+
+$$g_ t=\nabla_ {\theta_ t} J(\theta_ t)$$
+
+$$m_ t= \gamma m_ {t-1}+\eta g_ t$$
+
+$$\theta_ {t+1}=\theta_ t-(\gamma m_ t+\eta g_ t)$$
+
+回顾Adam：
+
+$$m_ t=\beta_ 1 m_ {t-1}+(1-\beta_ 1)g_ t$$
+
+$$\hat{m_ t}=\frac{m_ t}{1-\beta_ 1^t}$$
+
+$$\theta_ {t+1}=\theta_ t-\frac{\eta}{\sqrt{\hat{v_ t}}+\epsilon} \hat{m_ t}$$
+
+展开得：
+
+$$\theta_ {t+1}=\theta_ t-\frac{\eta}{\sqrt{\hat{v_ t}}+\epsilon}(\frac{\beta_ 1 m_ {t-1}}{1-\beta_1^t} +\frac{(1-\beta_ 1)g_ t}{1-\beta^t_ 1})$$
+
+注意到 $\frac{\beta_ 1 m_ {t-1}}{1-\beta_ 1^t}$ 是上一步的动量的偏差矫正估计，使用 $\hat{m}_ {t-1}$ 替代可得：
+
+$$\theta_ {t+1}=\theta_ t-\frac{\eta}{\sqrt{\hat{v_ t}}+\epsilon}(\beta_ 1 \hat{m}_ {t-1} +\frac{(1-\beta_ 1)g_ t}{1-\beta^t_ 1})$$
+
+添加Nesterov动量项，将上一步动量的偏差校正估计 $\hat{m_ {t-1}}$ 换成当前的动量偏差矫正 $\hat{m_ t}$ ，得到Nadam更新规则：
+
+$$\theta_ {t+1}=\theta_ t-\frac{\eta}{\sqrt{\hat{v_ t}}+\epsilon}(\beta_ 1 \hat{m}_ {t} +\frac{(1-\beta_ 1)g_ t}{1-\beta^t_ 1})$$
+
+### 算法可视化
