@@ -92,3 +92,73 @@ $$\theta_ {t+1}=\theta_ t-\eta\cdot g_ t$$
 
 其中将来近似位置利用动量得到： $\theta_ t'=\theta_ t-\gamma\cdot\eta\cdot g_ {t-1}$ .NAG首先通过上一步方向 $g_ t$ 和动量项 $\gamma$ 和学习率 $\eta$ 得到未来近似位置 $\theta_ t'$ ，再利用梯度 $\nabla L(\theta_t')$ 更新到 $\theta_ {t+1}$.
 
+### Adam
+> Adam(Adaptive Moment Estimation，自适应矩估计)，是自适应学习率的MBO，基于动量。Adam使得梯度呈指数衰减，因为Momentum中的学习率是固定的，因此对于不同的任务需要很多时间和精力去重新设定超参数使其适应问题。    
+> Adam通过梯度 $v_ t$ 平方的指数平均收敛来自动调整学习率 $\eta_ t$ 。    
+> 这样一来，对于不常出现的特征参数执行较大更新，对于出现较频繁的特征参数执行较小更新。因为不常出现的特征其参数多为0，因此梯度平方和更小，倒数更大，更新就更大。反之，频繁出现的特征更新就更小。
+
+**更新规则：**
+
+$$v_ t=\lambda \cdot v_ {t-1}+\nabla L^2(\theta_ t)$$
+
+$$\eta_ t=\frac{\eta}{\sqrt{v_ t}+\epsilon}$$
+
+$$g_ t=\gamma \cdot g_ {t-1}+\nabla L(\theta_ t)$$
+
+$$\theta_ {t+1}=\theta_ t-\eta_ t\cdot g_ t$$
+
+其中 $\lambda=0.999$ .
+### QHAdam
+> QHAdam结合了QHM和Adam。降低梯度方差并加速收敛。QHAdam通过提高 $\nabla L(\theta_ t)$ 的权重调整 $g_ t$ ，通过提高 $\nabla L^2(\theta_ t)$ 的权重调整 $\eta_ t$ 。
+
+**更新规则：**
+
+$$v_ t'=\lambda \cdot v_ {t-1}'+\nabla L^2(\theta_ t)$$
+
+$$v_ t=v_ t'+\beta^2\cdot \nabla L^2(\theta_ t)$$
+
+$$\eta_ t=\frac{\eta}{\sqrt{v_ t}+\epsilon}$$
+
+$$g_ t'=\gamma \cdot g_ {t-1}'+\nabla L(\theta_ t)$$
+
+$$g_ t=g_ t'+\beta \cdot \nabla L(\theta_ t)$$
+
+$$\theta_ {t+1}=\theta_ t-\eta_ t \cdot g_ t$$
+
+### Nadam
+> Nadam结合了NAG和Adam。Nadam在NAG中加入了自适应学习率 $\eta_ t$ 以适应不同任务。    
+> Nadam在Adam中加入了未来梯度 $\nabla L(\theta_ t')$ 以提高小球的预测能力，以避免越过极小值点。
+
+**更新规则：**
+
+$$v_ t=\lambda \cdot v_ {t-1}+\nabla L^2(\theta_ t)$$
+
+$$\eta_ t=\frac{\eta}{\sqrt{v_ t}+\epsilon}$$
+
+$$g_ t'=\gamma \cdot g_ {t-1}'+\nabla L(\theta_ t')$$
+
+$$g_ t=g_ t'+\beta \cdot \nabla L(\theta_ t)$$
+
+$$\theta_ {t+1}=\theta_ t-\eta_ t \cdot g_ t$$
+
+### AdaMax
+> 由于Adam中两个范数在高维空间中不稳定。因此样本数据为高维时，Adam算法表现很不稳定，因此使用无穷范数 $|| \cdot||^ \infty$ 代替其中的范数。
+
+**更新规则：**
+
+$$v_ t=\lambda\cdot v_ {t-1}+|| \nabla L(\theta_ t) ||^\infty$$
+
+$$\eta_ t=\frac{\eta}{\sqrt{v_ t}+\epsilon}$$
+
+$$g_ t=\gamma\cdot g_ {t-1}+\nabla L(\theta_ t)$$
+
+$$\theta_ {t+1}=\theta_ t-\eta_ t\cdot g_t$$
+
+### MBOs的一般更新格式：
+
+$$\theta_ {t+1}=\theta_ t-\eta_ t\cdot g_ t$$
+
+-  $g_ t$ ：梯度指数衰减平均；
+-  $\eta_ t$ ：学习率指数衰减平均。
+
+####  $g_ t$ 调整规则
