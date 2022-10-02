@@ -162,3 +162,7 @@ $$\theta_ {t+1}=\theta_ t-\eta_ t\cdot g_ t$$
 -  $\eta_ t$ ：学习率指数衰减平均。
 
 ####  $g_ t$ 调整规则
+
+
+
+![梯度的更新图解](https://github.com/Damon-Chang/Note-of-gradient-descent/blob/main/UQN/notes/pics/37c89350-421d-11ed-bff7-65292cfeafc0.jpeg)
