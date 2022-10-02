@@ -163,6 +163,56 @@ $$\theta_ {t+1}=\theta_ t-\eta_ t\cdot g_ t$$
 
 ####  $g_ t$ 调整规则
 
+$$g_ t'=\gamma \cdot g_{t-1}'+M_ t''$$
 
+$$g_ t=g_ t'+M_ t'$$
+
+其中 $g_ 0=\nabla L(\theta_ 0)$ ， $\theta_ 0$ 是初始定义的参数。图示如下所示：
 
 ![梯度的更新图解](https://github.com/Damon-Chang/Note-of-gradient-descent/blob/main/UQN/notes/pics/37c89350-421d-11ed-bff7-65292cfeafc0.jpeg)
+
+将上面的公式展开有： 
+
+$$g_ t'=\gamma^t\cdot\nabla L(\theta_0)+\sum_ {i=0}^{t-1} \gamma^i \cdot M_{t-i}''$$
+
+其中为了更一般的表示，令 
+
+$$M_ t'=\omega'\cdot\nabla L(f'(t))$$
+
+$$M_ t''=\omega''\cdot\nabla L(f''(t))$$
+
+其中 $\omega'$ , $\omega''\in\mathcal{Q}^+$ ，$f'(t)$ 和 $f''(t)$ 是 $t$ 的函数。**不同的优化器具有不同的 $\omega',\omega'',f'(t),f''(t)$** ，例如：   
+令 $\omega'=\beta,\omega''=1,f'(t)=\theta_t,f''(t)=\theta_t$ 就得到了QHM：
+
+$$g_ t'=\gamma \cdot g_ {t-1}'+\nabla L(\theta_ t)$$
+
+$$g_ t=g_ t'+\beta\cdot\nabla L(\theta_ t)$$
+
+令 $\omega'=0,\omega''=1,f'(t)=0,f''(t)=\theta_t-\gamma\cdot\eta g_ {t-1}'$ 就得到NAG：
+
+$$g_ t=\gamma \cdot g_{t-1}+\nabla L(\theta_t')$$
+
+$$\theta_ {t+1}=\theta_ t-\eta\cdot g_ t$$
+
+#### $\eta_ t$ 调整规则
+在 MBOs中引入学习率 $\eta_ t$ 调整规则，归纳为下面的形式：
+
+$$v_ t'=\lambda\cdot v_ {t-1}'+(N_ t'')^2$$
+
+$$v_ t=v_ t'+(N_ t')^2$$
+
+$$\eta_ t=\frac{\eta}{\sqrt{v_ t}+\epsilon}$$
+
+其中： $\epsilon$ 是一个极小的正数，保证了分母不等于0， $v_ t$ 是梯度平方的指数衰减平均值。 $\lambda\in [0,1]$ 且 $\lambda$ 接近1。不同的优化器有不同的 $N_ t'$ 和 $N_ t''$ 。例如：    
+取 $N_ t''=\nabla L(\theta_ t)$ ， $N_ t''=\beta \cdot \nabla L(\theta_ t)$ ，就得到了QHAdam的学习率更新规则：
+
+$$v_ t'=\lambda \cdot v_ {t-1}'+\nabla L^2(\theta_ t)$$
+
+$$v_ t=v_ t'+\beta^2\cdot \nabla L^2(\theta_ t)$$
+
+$$\eta_ t=\frac{\eta}{\sqrt{v_ t}+\epsilon}$$
+
+为了更清楚地显示优化器之间的差异，我们对面优化器的更新规则进行了转换。将其转换为上述的一般形式公式。其变量值如下表所示。   
+
+![不同的优化器一般形式下的区别](https://github.com/Damon-Chang/Note-of-gradient-descent/blob/main/UQN/notes/pics/f82f3460-4230-11ed-bff7-65292cfeafc0.jpeg)
+
