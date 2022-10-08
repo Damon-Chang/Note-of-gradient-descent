@@ -216,3 +216,136 @@ $$\eta_ t=\frac{\eta}{\sqrt{v_ t}+\epsilon}$$
 
 ![不同的优化器一般形式下的区别](https://github.com/Damon-Chang/Note-of-gradient-descent/blob/main/UQN/notes/pics/f82f3460-4230-11ed-bff7-65292cfeafc0.jpeg)
 
+## 基于MBOs的无偏策略
+1. 说明广泛使用的MBOs是有偏差的，即小球下降方向和最速下降方向（ $\nabla L(\theta_ t)$ 的方向）不一致；
+2. 理想的优化器需要与最速下降方向一致，这样一来优化器可以快速下降并收敛到极小值；
+3. 一种无偏策略（Unbiased  Strategy）使得 $g_ t$ 的期望和 $\nabla L(\theta_ t)$ 相等；
+4. 最终将该无偏策略应用到Momentum，QHM，NAG。
+### Consistency between $g_ t$ 和 $\nabla L(\theta_ t)$ 之间的一致性
+ $g_ t$ 和 $\nabla L(\theta_ t)$ 方向是否一致的充要条件（necessary and sufficient condition）
+##### **Thm 1** MBOs的方向 $g_ t$ 和梯度方向 $\nabla L(\theta_ t)$ 一致，当且仅当 $\omega''\cdot \sum_{i=0}^{t} \gamma^i +\omega'=1$ . 其中 $\omega'$ 和 $\omega''$ 在梯度更新公式中为 $g_ t'=\gamma \cdot g_{t-1}'+M_ t''$ ， $g_ t=g_ t'+M_ t'$ .
+*proof.* 将 $g_ t'$ 和 $g_ t$ 展开:
+
+$$g_ 0'=M_ 0'', g_ 0=M_ 0''+M_ 0';$
+
+$$g_ 1'=\gamma\cdot M_ 0''+M_ 1'', g_ 1=\gamma\cdot M_ 0''+M_ 1''+M_ 1';$$
+
+$$......$$
+
+$$g_ t'=\sum_ {i=0}^{t} \gamma^i\cdot M_ {t-i}'', g_ t=\sum_ {t=0}^{t}\gamma^i\cdot M_ {t-1}''+M_ t'=\omega''\cdot \sum_ {i=0}^{t}\gamma^i\cdot \nabla L(f''(t))+\omega'\cdot\nabla L(f'(t)).$$
+
+当 $\omega''\cdot \sum_{i=0}^{t} \gamma^i+\omega'=1$ 时，期望 $E[g_ t]=\nabla L(\theta_ t)$ ，因此此时 $g_ t$ 是梯度 $\nabla L(\theta_ t)$ 的无偏估计。
+
+##### **引理1** MBOs方法中的梯度方向 $g_ t$ 和最快下降方向 $\nabla L(\theta_ t)$ 不一致。
+*proof：*  **Momentum：** $\omega'=0,\omega''=1$ ，则 $\omega''\cdot \sum_{i=0}^{t} \gamma^i+\omega'=\lim_ {t\to\infty}\sum_{i=0}^{t} \gamma^i \neq1$   
+**QHM:** $\omega'=\beta,\omega''=1$ ，则 $\omega''\cdot \sum_{i=0}^{t} \gamma^i+\omega'=\lim_ {t\to\infty}\sum_{i=0}^{t} \gamma^i+\beta \neq1$      
+ **NAG:** $\omega'=0,\omega''=1$ ，则 $\omega''\cdot \sum_{i=0}^{t} \gamma^i+\omega'=\lim_ {t\to\infty}\sum_{i=0}^{t} \gamma^i \neq1$      
+ 而Adam是基于Momentum的算法，只改变了学习率，QGAdam，Nadam，AdaMax都是基于Adam的算法。因此这些方法也继承了同样的缺点。
+### 无偏策略
+ - 策略：在 $\omega''\cdot \sum_{i=0}^{t} \gamma^i+\omega'$ 中调整 $\omega''$ 使得 $\omega''\cdot \sum_{i=0}^{t} \gamma^i+\omega'=1$ ，即 $g_ t=\nabla L(\theta_ t)$ .
+ - 具体方法：
+将 $\omega''$ 调整为 $\Omega''$ ，使得 $\Omega''\cdot \sum_{i=0}^{t} \gamma^i+\omega'=1$ 即 $\Omega''\cdot \sum_{i=0}^{t} \gamma^i=1-\omega'$ ，两边同乘 $(1-\gamma)$ :
+
+$$(1-\gamma)\cdot\Omega''\cdot \sum_{i=0}^{t} \gamma^i=(1-\gamma)(1-\omega')$$
+
+因为当 $t$ 足够大时 $(1-\gamma)\cdot \sum_{i=0}^{t} \gamma^i=1(1-\gamma^{t+1}\to1,t\to\infty)$ ，因此
+
+$$\Omega''=(1-\gamma)\cdot (1-\omega')$$
+
+因此，基于梯度更新的式子：
+
+$$g_ t'=\gamma \cdot g_{t-1}'+M_ t''$$
+
+$$g_ t=g_ t'+M_ t'$$
+
+做调整 $M_ t''=\omega''\cdot\nabla L(f''(t))$ 变为 $M_ t''=\Omega''\cdot\nabla L(f''(t))=\frac{1-\omega'}{\omega''}\cdot (1-\gamma)\cdot \omega''\cdot \nabla L(f''(t))=\frac{1-\omega'}{\omega''}\cdot (1-\gamma)\cdot M_ t''$ . 因此 $g_ t$ 无偏策略的调整规则为：
+
+$$g_ t'=\gamma\cdot g_ {t-1}'+\frac{1-\omega'}{\omega''}\cdot (1-\gamma)\cdot M_ t''$$
+
+$$g_ t=g_ t'+M_ t'$$
+
+其中 $0<\gamma<1$ .   
+
+下面将无偏策略应用到无自适应学习率的 MBOs，即QNM，NAG。    
+**我们不将无偏策略应用于采用自适应学习率的Adam，QHAdam，Nadam和AdaMax。**自适应学习率MBOs在不改变 $g_ t$ 的情况下调整 $\eta_t$ 。同时，避免自适应学习率对无偏策略的影响，更好地研究无偏策略的改进效果。
+
+#### 无偏动量（U-Momentum）
+ $g_ t$ 的更新策略更改为：
+
+$$g_ t=g_ t'=\gamma\cdot g_ {t-1}'+(1-\gamma)\cdot \nabla L(\theta_ t)$$
+
+原来 $\omega'=0, \omega''=1$其中根据无偏策略做出的改动为： $\omega'=0, \omega''=(1-\gamma)$ 
+#### 无偏QHM（U-QHM）
+ $g_ t$ 更新策略改为
+
+$$g_ t'=\gamma\cdot g_ {t-1}'+(1-\beta)(1-\gamma)\nabla L(\theta_ t)$$
+
+$$g_ t=g_ t'+\beta \cdot \nabla L(\theta_ t)$$
+
+原来 $\omega''=1, \omega''=\beta$ 改为 $\omega''=(1-\beta)(1-\gamma), \omega'=\beta$ .
+#### 无偏NAG
+  $g_ t$ 更新策略改为
+
+$$g_ t=\gamma\cdot g_ {t-1}'+(1-\gamma)\cdot \nabla L(\theta_ t')$$
+
+原来 $\omega''=1, \omega'=0$ 变为 $\omega''=(1-\gamma), \omega'=0$ .
+## UQN:结合U-QHM和U-NAG
+UQN:加速收敛+统一 $g_ t$ 和 $\nabla L(\theta_ t)$ 方向+降低梯度方差。
+### 非自适应学习率情况下使用UQN下MBOs的梯度方差分析
+UQN-Momentum的更新规则：
+
+$$\eta_ t=\eta$$
+
+$$g_ t'=\gamma\cdot g_ t'+(1-\gamma)\cdot(1-\beta)\cdot\nabla L(\theta_ t)$$
+
+$$g_ t=g_ t'+\beta\cdot\nabla L(\theta-\gamma\cdot\eta\cdot g_ {t-1}')$$
+
+$$\theta_ {t+1}=\theta-\eta_ t\cdot g_ t$$
+
+##### Thm 2：$\lim_ {t\to\infty} Variance(UQN-Momentum)=\alpha\cdot\Sigma$ 其中 $\Sigma$ 是Momentum的梯度方差， $\alpha=\frac{2}{1+\gamma}\cdot \beta_ 2-2\frac{1-\gamma}{1+\gamma}\cdot\beta+\frac{1-\gamma}{1+\gamma}$ .
+*proof* 将上面式子中的 $g_ t$ 展开可得
+
+$$g_ t=(1-\beta)\cdot(1-\gamma)\cdot\gamma_ t\cdot\nabla L(\theta_ t)+……$$
+
+$$+(1-\beta)\cdot(1-\gamma)\cdot\gamma_ 0\cdot\nabla L(\theta_ t)+\beta\nabla L(\theta_ {t+1})$$
+ 
+假设 $\nabla L(\theta_ {t+1-i})$ 是独立同分布的随机向量。 $\nabla L(\theta_ {t+1-i})$ 的系数 $\delta_ i$ 是
+
+$$ \delta_ i=\left\{ \begin{aligned} 
+\beta & & {i=0} \\
+(1-\beta)\cdot(1-\gamma)\cdot\gamma_ {i-1} & & {i=1,……,t+1}\\
+\end{aligned} \right. $$
+
+$${\lim_ {t\to\infty}}^2 Variance(UQN-Momentum)=\lim_ {t\to\infty} \sum_ {i=0}^{t+1} \delta_ i^2\cdot \Sigma$$
+
+其中
+
+$$\lim_ {t\to\infty} \sum_ {i=0}^{t+1} \delta_ i^2=\beta^2+(1-\beta)^2\cdot\frac{1-\gamma}{1+\gamma}$$
+
+$$=\frac{2}{1+\gamma}\cdot \beta^2-2\frac{1-\gamma}{1+\gamma}\cdot\beta+\frac{1-\gamma}{1+\gamma}$$
+
+因此 $\alpha=\lim_ {t\to\infty}\delta_ i^2=\frac{2}{1+\gamma}\cdot \beta_ 2-2\frac{1-\gamma}{1+\gamma}\cdot\beta+\frac{1-\gamma}{1+\gamma}$ .
+
+由该定理可见，当 $\gamma,\beta\in(0,1)$ 时 $\alpha<1$ ，即UQN-Momentum相比于Monmentum降低了梯度方差。同理，利用上面的证明过程也可以说明，对于其他MBOs，UQN方法同昂可以降低梯度方差。
+
+### 使用UQN改进具有自适应学习率的MBOs
+将带有自适应学习率的MBOs（即Adam，QHAdam，Nadam，AdaMax）和UQN结合。一般形式的更新规则如下
+
+$$v_ t'=\lambda\cdot v_ {t-1}'+(N_ t'')^2$$
+
+$$v_ t=v_ t'+\beta^2\cdot\nabla L^2(\theta_ t)$$
+
+$$\eta_ t=\frac{\eta}{\sqrt{v_ t}+\epsilon}$$
+
+$$g_ t'=\gamma\cdot g_ {t-1}'+\frac{1-\beta}{\omega''}\cdot(1-\gamma)\cdot M_ t''$$
+
+$$g_ t=g_ t'+\beta\cdot\nabla L(\theta_ t')$$
+
+$$\theta_ {t+1}=\theta_ t-\eta_ t\cdot g_ t$$
+
+其中 $\theta_ t'=\theta_ t-\gamma\cdot\eta\cdot g_ {t-1}'$ .
+#### UQN-Adam
+ 
+
+
+
