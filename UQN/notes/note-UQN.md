@@ -344,8 +344,69 @@ $$g_ t=g_ t'+\beta\cdot\nabla L(\theta_ t')$$
 $$\theta_ {t+1}=\theta_ t-\eta_ t\cdot g_ t$$
 
 其中 $\theta_ t'=\theta_ t-\gamma\cdot\eta\cdot g_ {t-1}'$ .
-#### UQN-Adam
+#### UQN-Adam和UQN-QHAdam
  
+$$v_ t'=\lambda\cdot v_ {t-1}'+\nabla^2L(\theta_ t)$$
+
+$$v_ t=v_ t'+\beta^2\cdot\nabla L^2(\theta_ t)$$
+
+$$\eta_ t=\frac{\eta}{\sqrt{v_ t}+\epsilon}$$
+
+$$g_ t'=\gamma\cdot g_ {t-1}'+(1-\beta)\cdot(1-\gamma)\cdot \nabla L(\theta_ t)$$
+
+$$g_ t=g_ t'+\beta\cdot\nabla L(\theta_ t')$$
+
+$$\theta_ {t+1}=\theta_ t-\eta_ t\cdot g_ t$$
+
+#### UQN-Nadam
+ 
+$$v_ t'=\lambda\cdot v_ {t-1}'+\nabla^2L(\theta_ t)$$
+
+$$v_ t=v_ t'+\beta^2\cdot\nabla L^2(\theta_ t)$$
+
+$$\eta_ t=\frac{\eta}{\sqrt{v_ t}+\epsilon}$$
+
+$$g_ t'=\gamma\cdot g_ {t-1}'+(1-\beta)\cdot(1-\gamma)\cdot \nabla L(\theta_ t')$$
+
+$$g_ t=g_ t'+\beta\cdot\nabla L(\theta_ t')$$
+
+$$\theta_ {t+1}=\theta_ t-\eta_ t\cdot g_ t$$
+
+### UQN-Nadam
+ 
+$$v_ t'=\lambda\cdot v_ {t-1}'+\nabla^2L(\theta_ t)$$
+
+$$v_ t=v_ t'+\beta^2\cdot\nabla L^2(\theta_ t)$$
+
+$$\eta_ t=\frac{\eta}{\sqrt{v_ t}+\epsilon}$$
+
+$$g_ t'=\gamma\cdot g_ {t-1}'+(1-\beta)\cdot(1-\gamma)\cdot \nabla L(\theta_ t')$$
+
+$$g_ t=g_ t'+\beta\cdot\nabla L(\theta_ t')$$
+
+$$\theta_ {t+1}=\theta_ t-\eta_ t\cdot g_ t$$
+
+### UQN-AdaMax
+ 
+$$v_ t'=\lambda\cdot v_ {t-1}'+\nabla^2L(\theta_ t)^\infty$$
+
+$$v_ t=v_ t'+\beta^2\cdot\nabla L^2(\theta_ t)$$
+
+$$\eta_ t=\frac{\eta}{\sqrt{v_ t}+\epsilon}$$
+
+$$g_ t'=\gamma\cdot g_ {t-1}'+(1-\beta)\cdot(1-\gamma)\cdot \nabla L(\theta_ t)$$
+
+$$g_ t=g_ t'+\beta\cdot\nabla L(\theta_ t')$$
+
+$$\theta_ {t+1}=\theta_ t-\eta_ t\cdot g_ t$$
+
+## 收敛性分析
+##### Thm 3 用无偏策略改进的MBOs加速收敛策略收敛，当且仅当
+
+$$k_ i<\tau\cdot\frac{\mu^2}{2m}$$
+
+其中
+
 
 
 
