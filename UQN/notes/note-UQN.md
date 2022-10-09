@@ -405,7 +405,15 @@ $$\theta_ {t+1}=\theta_ t-\eta_ t\cdot g_ t$$
 
 $$k_ i<\tau\cdot\frac{\mu^2}{2m}$$
 
-其中
+其中$\tau=1-\gamma\cdot(1-\omega')$ ，m是粒子的质量，µ 是牛顿力场的摩擦系数。
+*proof* 因为Momentum就是基于物理中的动量的概念进行的梯度下降改进，这个定理也是关于物理中动力学的内容。 
+##### 引理 2 使用UQN改善的MBOs策略加速收敛，当且仅当
+
+$$k_ i<\tau\cdot\frac{\mu^2}{2m}$$
+
+其中 $\tau=1-\gamma\cdot(1-\beta)$ .
+
+
 
 
 
