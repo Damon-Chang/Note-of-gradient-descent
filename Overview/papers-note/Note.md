@@ -148,10 +148,10 @@ $$\theta_{t+1}=\theta_t+\triangle\theta_t$$
 RMSprop是一个未发表的自适应学习率方法。是Geoff Hinton在他的[课程](http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf)中提出来的。
 RMSprop 和 Adadelta 都是在同一时间独立开发的，因为需要解决 Adagrad 急剧下降的学习率问题。RMSprop 实际上与我们上面推导出的 Adadelta 的第一个更新向量相同，更新规则：
 
-$$E[g^2]_t=0.9E[g^2]_{t-1}+0.1g_t^2$$
+$$E[g^2]_ t=0.9E[g^2]_ {t-1}+0.1g_ t^2$$
 
-$$\theta_{t+1}=\theta_t-\frac{\eta}{\sqrt{E[g^2]_t+\epsilon}} g_t$$
-
+$$\theta_ {t+1}=\theta_ t-\frac{\eta}{\sqrt{E[g^2]_ t+\epsilon}} g_ t$$
+ 
 RMSprop页将学习率除以平方梯度指数衰减的平均值。Hinton建议： $\gamma=0.9$ , $\eta=0.001$.
 ### Adam
 Adam（Adaptive Moment Estimation）自适应矩估计对每一个参数计算自适应学习率。除了像Adadelta和RMSprop一样存储过去梯度指数递减的平均平方值 $v_t$ ，Adam还存储过去梯度指数递减的平均值 $m_t$ ，和动量类似.
